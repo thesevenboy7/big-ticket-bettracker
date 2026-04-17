@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Big Ticket — BetTracker</title>
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --bg2: #141414;
+    --bg3: #1c1c1c;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --text2: #888;
+    --green: #22c55e;
+    --red: #C8102E;
+    --yellow: #f59e0b;
+    --blue: #c8102e;
+    --purple: #e8a020;
+    --accent: #C8102E;
+    --accent2: #e8a020;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
+
+  /* HEADER */
+  header { background: linear-gradient(135deg, #0d0000 0%, #1a0505 50%, #0d0000 100%); border-bottom: 2px solid var(--accent); padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; }
+  header::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 30px, rgba(200,16,46,.04) 30px, rgba(200,16,46,.04) 31px); pointer-events: none; }
+  .header-left { display: flex; align-items: center; gap: 14px; z-index: 1; }
+  .header-logo { width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(200,16,46,.5)); }
+  .header-titles { display: flex; flex-direction: column; }
+  header h1 { font-size: 22px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; line-height: 1; }
+  header h1 span { color: var(--accent); }
+  .header-sub { font-size: 10px; color: var(--accent2); text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; font-weight: 600; }
+  .header-banca { text-align: right; }
+  .header-banca small { color: var(--text2); font-size: 11px; display: block; }
+  .header-banca strong { font-size: 18px; }
+  .banca-pos { color: var(--green); }
+  .banca-neg { color: var(--red); }
+
+  /* TABS */
+  nav { background: linear-gradient(135deg, #1a0a0a 0%, #2a0a0a 100%); border-bottom: 1px solid #3a1010; padding: 0 24px; display: flex; gap: 0; }
+  nav button { background: none; border: none; color: var(--text2); padding: 14px 20px; cursor: pointer; font-size: 14px; border-bottom: 2px solid transparent; transition: all .15s; }
+  nav button.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
+  nav button:hover:not(.active) { color: var(--text); }
+
+  /* MAIN */
+  main { padding: 24px; max-width: 1400px; margin: 0 auto; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* HERO */
+  .hero { position: relative; border-radius: 12px; overflow: hidden; margin-bottom: 24px; min-height: 160px; display: flex; align-items: flex-end; }
+  .hero-bg { position: absolute; inset: 0; background-image: url('G3BZiAsbYAAGL4_.jpg'); background-size: cover; background-position: center 20%; filter: brightness(.45) saturate(1.2); }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(10,0,0,.85) 0%, rgba(10,0,0,.4) 60%, transparent 100%); }
+  .hero-content { position: relative; z-index: 1; padding: 24px 28px; }
+  .hero-content h2 { font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; }
+  .hero-content h2 span { color: var(--accent); }
+  .hero-content p { color: rgba(255,255,255,.6); font-size: 12px; margin-top: 6px; text-transform: uppercase; letter-spacing: 1.5px; }
+
+  /* CARDS KPI */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; position: relative; overflow: hidden; }
+  .kpi-card::before { content: ''; position: absolute; right: -10px; bottom: -10px; width: 64px; height: 64px; background: url('AtlantaHawksLogoDesign.webp') center/contain no-repeat; opacity: .04; pointer-events: none; }
+  .kpi-card .label { color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 8px; }
+  .kpi-card .value { font-size: 22px; font-weight: 700; }
+  .kpi-card .sub { color: var(--text2); font-size: 11px; margin-top: 4px; }
+  .green { color: var(--green); }
+  .red { color: var(--red); }
+  .yellow { color: var(--yellow); }
+  .blue { color: var(--blue); }
+  .purple { color: var(--purple); }
+
+  /* SECTION */
+  .section { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+  .section h2 { font-size: 14px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 16px; }
+
+  /* COMP TABLE */
+  .comp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .comp-card { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .comp-card h3 { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+  .comp-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--border); }
+  .comp-row:last-child { border-bottom: none; }
+  .comp-row span:first-child { color: var(--text2); font-size: 12px; }
+
+  /* ALERTAS */
+  .alert-bar { display: none; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; font-weight: 600; font-size: 13px; }
+  .alert-bar.show { display: flex; align-items: center; gap: 10px; }
+  .alert-loss { background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.4); color: var(--red); }
+  .alert-win { background: rgba(34,197,94,.15); border: 1px solid rgba(34,197,94,.4); color: var(--green); }
+
+  /* CONFIG */
+  .config-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .config-item label { display: block; color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .config-item input, .config-item select { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+  .config-item input:focus, .config-item select:focus { outline: none; border-color: var(--accent); }
+  .config-derived { display: flex; flex-direction: column; gap: 4px; }
+  .config-derived span { font-size: 12px; color: var(--text2); }
+  .config-derived strong { color: var(--text); }
+
+  /* FORM APOSTA */
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .form-field label { display: block; color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .form-field input, .form-field select, .form-field textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 14px; }
+  .form-field textarea { resize: vertical; min-height: 38px; }
+  .form-field input:focus, .form-field select:focus, .form-field textarea:focus { outline: none; border-color: var(--accent); }
+  .form-field.wide { grid-column: span 2; }
+  .form-calc { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; padding: 12px 16px; display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 16px; font-size: 13px; }
+  .form-calc span { color: var(--text2); }
+  .form-calc strong { color: var(--text); }
+  .btn { padding: 9px 20px; border-radius: 7px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity .15s; }
+  .btn:hover { opacity: .85; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-danger { background: rgba(239,68,68,.2); color: var(--red); border: 1px solid rgba(239,68,68,.3); }
+  .btn-edit { background: rgba(99,102,241,.15); color: var(--accent); border: 1px solid rgba(99,102,241,.3); }
+  .btn-sm { padding: 5px 12px; font-size: 12px; }
+
+  /* TABELA */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: var(--bg3); color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; padding: 10px 12px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--border); }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); white-space: nowrap; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,.02); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+  .badge-ganhou { background: rgba(34,197,94,.15); color: var(--green); }
+  .badge-perdeu { background: rgba(239,68,68,.15); color: var(--red); }
+  .badge-pendente { background: rgba(245,158,11,.15); color: var(--yellow); }
+  .empty-state { text-align: center; color: var(--text2); padding: 48px; }
+  .empty-state p { margin-top: 8px; font-size: 13px; }
+
+  /* MODAL EDIT */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 100; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto; }
+  .modal h2 { font-size: 16px; margin-bottom: 20px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* SEARCH */
+  .table-controls { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .table-controls input, .table-controls select { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 13px; }
+  .table-controls input { flex: 1; min-width: 200px; }
+  .table-controls input:focus, .table-controls select:focus { outline: none; border-color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <img src="Atlanta_Hawks.png" alt="Atlanta Hawks" class="header-logo">
+    <div class="header-titles">
+      <h1>Big <span>Ticket</span></h1>
+      <div class="header-sub">BetTracker · Hawks Edition</div>
+    </div>
+  </div>
+  <div class="header-banca">
+    <small>Banca Atual</small>
+    <strong id="hdr-banca">R$ 0,00</strong>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('dashboard')">Dashboard</button>
+  <button onclick="showTab('lancamentos')">Lançamentos</button>
+</nav>
+
+<main>
+
+  <!-- ===== DASHBOARD ===== -->
+  <div id="tab-dashboard" class="tab-content active">
+
+    <div class="hero">
+      <div class="hero-bg"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <h2>Sua <span>Banca</span><br>em Jogo</h2>
+        <p>Track smarter · Win bigger</p>
+      </div>
+    </div>
+
+    <div id="alert-loss" class="alert-bar alert-loss">⚠️ STOP LOSS atingido! Parar apostas hoje.</div>
+    <div id="alert-win" class="alert-bar alert-win">🎯 STOP WIN atingido! Proteja os lucros.</div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="label">Banca Atual</div>
+        <div class="value" id="d-banca-atual">R$ 0</div>
+        <div class="sub" id="d-banca-pct">0% da banca inicial</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Lucro / Prejuízo</div>
+        <div class="value" id="d-lucro">R$ 0</div>
+        <div class="sub" id="d-roi">ROI: 0%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Total Apostas</div>
+        <div class="value blue" id="d-total">0</div>
+        <div class="sub" id="d-wins-losses">0 ganhou · 0 perdeu</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Taxa de Acerto</div>
+        <div class="value" id="d-acerto">0%</div>
+        <div class="sub" id="d-acerto-sub">de apostas resolvidas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Total Investido</div>
+        <div class="value blue" id="d-investido">R$ 0</div>
+        <div class="sub">soma de entradas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Total Retorno</div>
+        <div class="value green" id="d-retorno">R$ 0</div>
+        <div class="sub">apostas ganhas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Odd Média</div>
+        <div class="value purple" id="d-odd-media">0.00</div>
+        <div class="sub">apostas ganhas</div>
+      </div>
+      <div class="kpi-card">
+        <div class="label">Maior Ganho</div>
+        <div class="value green" id="d-maior">R$ 0</div>
+        <div class="sub">em uma aposta</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Por Competição</h2>
+      <div class="comp-grid" id="comp-grid"></div>
+    </div>
+
+    <div class="section">
+      <h2>Configurações da Banca</h2>
+      <div class="config-grid">
+        <div class="config-item">
+          <label>Banca Inicial (R$)</label>
+          <input type="number" id="cfg-banca" value="1000" min="0" step="50" oninput="saveConfig(); updateDashboard();">
+        </div>
+        <div class="config-item">
+          <label>Casa de Apostas</label>
+          <input type="text" id="cfg-casa" value="Betano" oninput="saveConfig();">
+        </div>
+        <div class="config-item">
+          <label>Limites Automáticos</label>
+          <div class="config-derived">
+            <span>Stop Loss: <strong id="cfg-sl">-R$ 100,00</strong></span>
+            <span>Stop Win: <strong id="cfg-sw">+R$ 100,00</strong></span>
+            <span>Entrada Padrão: <strong id="cfg-ep">R$ 20,00</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== LANÇAMENTOS ===== -->
+  <div id="tab-lancamentos" class="tab-content">
+
+    <div class="section">
+      <h2>Nova Aposta</h2>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Data</label>
+          <input type="date" id="f-data">
+        </div>
+        <div class="form-field">
+          <label>Competição</label>
+          <select id="f-comp">
+            <option value="NBA">NBA</option>
+            <option value="Champions League">Champions League</option>
+            <option value="Libertadores">Libertadores</option>
+            <option value="Sul-Americana">Sul-Americana</option>
+            <option value="Brasileirão">Brasileirão</option>
+            <option value="Copa do Mundo">Copa do Mundo</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+        <div class="form-field wide">
+          <label>Jogo / Mercado</label>
+          <input type="text" id="f-jogo" placeholder="Ex: Lakers vs Celtics — Moneyline">
+        </div>
+        <div class="form-field">
+          <label>Entrada (R$)</label>
+          <input type="number" id="f-entrada" min="0" step="0.01" placeholder="0,00" oninput="calcPreview();">
+        </div>
+        <div class="form-field">
+          <label>Odd</label>
+          <input type="number" id="f-odd" min="1" step="0.01" placeholder="1.00" oninput="calcPreview();">
+        </div>
+        <div class="form-field">
+          <label>Resultado</label>
+          <select id="f-resultado" onchange="calcPreview();">
+            <option value="Pendente">Pendente</option>
+            <option value="Ganhou">Ganhou</option>
+            <option value="Perdeu">Perdeu</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label>Casa de Apostas</label>
+          <input type="text" id="f-casa" placeholder="Betano">
+        </div>
+        <div class="form-field wide">
+          <label>Obs.</label>
+          <textarea id="f-obs" placeholder="Observações opcionais..."></textarea>
+        </div>
+      </div>
+      <div class="form-calc">
+        <div><span>Retorno Bruto: </span><strong id="prev-retorno">R$ 0,00</strong></div>
+        <div><span>Lucro Líquido: </span><strong id="prev-lucro">R$ 0,00</strong></div>
+        <div><span>% da Banca: </span><strong id="prev-pct">0,00%</strong></div>
+      </div>
+      <button class="btn btn-primary" onclick="addBet()">Registrar Aposta</button>
+    </div>
+
+    <div class="section">
+      <h2>Histórico de Apostas</h2>
+      <div class="table-controls">
+        <input type="text" id="search" placeholder="Buscar jogo, competição..." oninput="renderTable();">
+        <select id="filter-comp" onchange="renderTable();">
+          <option value="">Todas as competições</option>
+          <option value="NBA">NBA</option>
+          <option value="Champions League">Champions League</option>
+          <option value="Libertadores">Libertadores</option>
+          <option value="Sul-Americana">Sul-Americana</option>
+          <option value="Brasileirão">Brasileirão</option>
+          <option value="Copa do Mundo">Copa do Mundo</option>
+          <option value="Outro">Outro</option>
+        </select>
+        <select id="filter-result" onchange="renderTable();">
+          <option value="">Todos os resultados</option>
+          <option value="Ganhou">Ganhou</option>
+          <option value="Perdeu">Perdeu</option>
+          <option value="Pendente">Pendente</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Data</th>
+              <th>Competição</th>
+              <th>Jogo / Mercado</th>
+              <th>Entrada</th>
+              <th>Odd</th>
+              <th>Retorno Bruto</th>
+              <th>Lucro Líquido</th>
+              <th>% Banca</th>
+              <th>Resultado</th>
+              <th>Casa</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="bet-tbody"></tbody>
+        </table>
+        <div id="empty-state" class="empty-state" style="display:none;">
+          <div style="font-size:32px;">📋</div>
+          <p>Nenhuma aposta registrada ainda.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL EDIÇÃO -->
+<div class="overlay" id="edit-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <h2>Editar Aposta</h2>
+    <input type="hidden" id="e-id">
+    <div class="form-grid">
+      <div class="form-field">
+        <label>Data</label>
+        <input type="date" id="e-data">
+      </div>
+      <div class="form-field">
+        <label>Competição</label>
+        <select id="e-comp">
+          <option value="NBA">NBA</option>
+          <option value="Champions League">Champions League</option>
+          <option value="Libertadores">Libertadores</option>
+          <option value="Sul-Americana">Sul-Americana</option>
+          <option value="Brasileirão">Brasileirão</option>
+          <option value="Copa do Mundo">Copa do Mundo</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+      <div class="form-field wide">
+        <label>Jogo / Mercado</label>
+        <input type="text" id="e-jogo">
+      </div>
+      <div class="form-field">
+        <label>Entrada (R$)</label>
+        <input type="number" id="e-entrada" min="0" step="0.01">
+      </div>
+      <div class="form-field">
+        <label>Odd</label>
+        <input type="number" id="e-odd" min="1" step="0.01">
+      </div>
+      <div class="form-field">
+        <label>Resultado</label>
+        <select id="e-resultado">
+          <option value="Pendente">Pendente</option>
+          <option value="Ganhou">Ganhou</option>
+          <option value="Perdeu">Perdeu</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Casa de Apostas</label>
+        <input type="text" id="e-casa">
+      </div>
+      <div class="form-field wide">
+        <label>Obs.</label>
+        <textarea id="e-obs"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ---- DATA ----
+let bets = [];
+let config = { bancaInicial: 1000, casa: 'Betano' };
+
+function loadData() {
+  const b = localStorage.getItem('bt_bets');
+  const c = localStorage.getItem('bt_config');
+  if (b) bets = JSON.parse(b);
+  if (c) config = JSON.parse(c);
+  document.getElementById('cfg-banca').value = config.bancaInicial;
+  document.getElementById('cfg-casa').value = config.casa;
+  document.getElementById('f-casa').value = config.casa;
+}
+
+function saveData() {
+  localStorage.setItem('bt_bets', JSON.stringify(bets));
+}
+
+function saveConfig() {
+  config.bancaInicial = parseFloat(document.getElementById('cfg-banca').value) || 1000;
+  config.casa = document.getElementById('cfg-casa').value || 'Betano';
+  localStorage.setItem('bt_config', JSON.stringify(config));
+  updateConfigDerived();
+}
+
+// ---- CALC ----
+function calcBet(entrada, odd, resultado) {
+  const e = parseFloat(entrada) || 0;
+  const o = parseFloat(odd) || 0;
+  const retornoBruto = e * o;
+  let lucroLiquido = 0;
+  if (resultado === 'Ganhou') lucroLiquido = retornoBruto - e;
+  else if (resultado === 'Perdeu') lucroLiquido = -e;
+  const pctBanca = config.bancaInicial > 0 ? (lucroLiquido / config.bancaInicial) * 100 : 0;
+  return { retornoBruto, lucroLiquido, pctBanca };
+}
+
+function calcPreview() {
+  const e = document.getElementById('f-entrada').value;
+  const o = document.getElementById('f-odd').value;
+  const r = document.getElementById('f-resultado').value;
+  const { retornoBruto, lucroLiquido, pctBanca } = calcBet(e, o, r);
+  document.getElementById('prev-retorno').textContent = fmt(retornoBruto);
+  const lEl = document.getElementById('prev-lucro');
+  lEl.textContent = fmt(lucroLiquido);
+  lEl.className = lucroLiquido > 0 ? 'green' : lucroLiquido < 0 ? 'red' : '';
+  document.getElementById('prev-pct').textContent = fmtPct(pctBanca);
+}
+
+// ---- BETS CRUD ----
+function addBet() {
+  const data = document.getElementById('f-data').value;
+  const comp = document.getElementById('f-comp').value;
+  const jogo = document.getElementById('f-jogo').value.trim();
+  const entrada = parseFloat(document.getElementById('f-entrada').value);
+  const odd = parseFloat(document.getElementById('f-odd').value);
+  const resultado = document.getElementById('f-resultado').value;
+  const casa = document.getElementById('f-casa').value.trim();
+  const obs = document.getElementById('f-obs').value.trim();
+
+  if (!data || !jogo || !entrada || !odd) {
+    alert('Preencha: Data, Jogo/Mercado, Entrada e Odd.');
+    return;
+  }
+
+  const { retornoBruto, lucroLiquido, pctBanca } = calcBet(entrada, odd, resultado);
+  const bet = { id: Date.now(), data, comp, jogo, entrada, odd, retornoBruto, lucroLiquido, pctBanca, resultado, casa, obs };
+  bets.unshift(bet);
+  saveData();
+  renderTable();
+  updateDashboard();
+  resetForm();
+}
+
+function deleteBet(id) {
+  if (!confirm('Excluir esta aposta?')) return;
+  bets = bets.filter(b => b.id !== id);
+  saveData();
+  renderTable();
+  updateDashboard();
+}
+
+function openEdit(id) {
+  const b = bets.find(x => x.id === id);
+  if (!b) return;
+  document.getElementById('e-id').value = b.id;
+  document.getElementById('e-data').value = b.data;
+  document.getElementById('e-comp').value = b.comp;
+  document.getElementById('e-jogo').value = b.jogo;
+  document.getElementById('e-entrada').value = b.entrada;
+  document.getElementById('e-odd').value = b.odd;
+  document.getElementById('e-resultado').value = b.resultado;
+  document.getElementById('e-casa').value = b.casa;
+  document.getElementById('e-obs').value = b.obs;
+  document.getElementById('edit-overlay').classList.add('show');
+}
+
+function saveEdit() {
+  const id = parseInt(document.getElementById('e-id').value);
+  const idx = bets.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  const entrada = parseFloat(document.getElementById('e-entrada').value);
+  const odd = parseFloat(document.getElementById('e-odd').value);
+  const resultado = document.getElementById('e-resultado').value;
+  const { retornoBruto, lucroLiquido, pctBanca } = calcBet(entrada, odd, resultado);
+  bets[idx] = {
+    ...bets[idx],
+    data: document.getElementById('e-data').value,
+    comp: document.getElementById('e-comp').value,
+    jogo: document.getElementById('e-jogo').value.trim(),
+    entrada, odd, retornoBruto, lucroLiquido, pctBanca, resultado,
+    casa: document.getElementById('e-casa').value.trim(),
+    obs: document.getElementById('e-obs').value.trim(),
+  };
+  saveData();
+  closeModal();
+  renderTable();
+  updateDashboard();
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('edit-overlay')) return;
+  document.getElementById('edit-overlay').classList.remove('show');
+}
+
+function resetForm() {
+  ['f-jogo','f-entrada','f-odd','f-obs'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('f-resultado').value = 'Pendente';
+  document.getElementById('f-data').value = today();
+  calcPreview();
+}
+
+// ---- RENDER TABLE ----
+function renderTable() {
+  const search = document.getElementById('search').value.toLowerCase();
+  const fComp = document.getElementById('filter-comp').value;
+  const fResult = document.getElementById('filter-result').value;
+
+  let filtered = bets.filter(b => {
+    const matchSearch = !search || b.jogo.toLowerCase().includes(search) || b.comp.toLowerCase().includes(search);
+    const matchComp = !fComp || b.comp === fComp;
+    const matchResult = !fResult || b.resultado === fResult;
+    return matchSearch && matchComp && matchResult;
+  });
+
+  const tbody = document.getElementById('bet-tbody');
+  const empty = document.getElementById('empty-state');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map((b, i) => {
+    const lucroClass = b.lucroLiquido > 0 ? 'green' : b.lucroLiquido < 0 ? 'red' : '';
+    const badge = b.resultado === 'Ganhou' ? 'badge-ganhou' : b.resultado === 'Perdeu' ? 'badge-perdeu' : 'badge-pendente';
+    return `<tr>
+      <td style="color:var(--text2)">${bets.length - bets.indexOf(b)}</td>
+      <td>${fmtDate(b.data)}</td>
+      <td>${b.comp}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis" title="${esc(b.jogo)}">${esc(b.jogo)}</td>
+      <td>${fmt(b.entrada)}</td>
+      <td>${parseFloat(b.odd).toFixed(2)}</td>
+      <td>${fmt(b.retornoBruto)}</td>
+      <td class="${lucroClass}">${fmt(b.lucroLiquido)}</td>
+      <td class="${lucroClass}">${fmtPct(b.pctBanca)}</td>
+      <td><span class="badge ${badge}">${b.resultado}</span></td>
+      <td style="color:var(--text2)">${esc(b.casa)}</td>
+      <td style="display:flex;gap:6px;">
+        <button class="btn btn-edit btn-sm" onclick="openEdit(${b.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteBet(${b.id})">✕</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ---- DASHBOARD ----
+function updateDashboard() {
+  const bancaInicial = config.bancaInicial;
+  const resolved = bets.filter(b => b.resultado !== 'Pendente');
+  const ganhou = bets.filter(b => b.resultado === 'Ganhou');
+  const perdeu = bets.filter(b => b.resultado === 'Perdeu');
+
+  const totalLucro = resolved.reduce((s, b) => s + b.lucroLiquido, 0);
+  const bancaAtual = bancaInicial + totalLucro;
+  const totalInvestido = resolved.reduce((s, b) => s + b.entrada, 0);
+  const totalRetorno = ganhou.reduce((s, b) => s + b.retornoBruto, 0);
+  const roi = totalInvestido > 0 ? (totalLucro / totalInvestido) * 100 : 0;
+  const acerto = resolved.length > 0 ? (ganhou.length / resolved.length) * 100 : 0;
+  const oddMedia = ganhou.length > 0 ? ganhou.reduce((s, b) => s + b.odd, 0) / ganhou.length : 0;
+  const maiorGanho = ganhou.length > 0 ? Math.max(...ganhou.map(b => b.lucroLiquido)) : 0;
+
+  const bancaPct = bancaInicial > 0 ? ((bancaAtual - bancaInicial) / bancaInicial) * 100 : 0;
+
+  const stopLoss = -(bancaInicial * 0.1);
+  const stopWin = bancaInicial * 0.1;
+
+  // Header
+  const hdr = document.getElementById('hdr-banca');
+  hdr.textContent = fmt(bancaAtual);
+  hdr.className = bancaAtual >= bancaInicial ? 'banca-pos' : 'banca-neg';
+
+  // KPIs
+  setVal('d-banca-atual', fmt(bancaAtual), bancaAtual >= bancaInicial ? 'green' : 'red');
+  setVal('d-banca-pct', `${bancaPct >= 0 ? '+' : ''}${bancaPct.toFixed(1)}% da banca inicial`);
+  setVal('d-lucro', fmt(totalLucro), totalLucro >= 0 ? 'green' : 'red');
+  setVal('d-roi', `ROI: ${roi >= 0 ? '+' : ''}${roi.toFixed(2)}%`);
+  setVal('d-total', bets.length, 'blue');
+  setVal('d-wins-losses', `${ganhou.length} ganhou · ${perdeu.length} perdeu`);
+  setVal('d-acerto', `${acerto.toFixed(1)}%`, acerto >= 55 ? 'green' : acerto >= 45 ? 'yellow' : 'red');
+  setVal('d-acerto-sub', `de ${resolved.length} apostas resolvidas`);
+  setVal('d-investido', fmt(totalInvestido), 'blue');
+  setVal('d-retorno', fmt(totalRetorno), 'green');
+  setVal('d-odd-media', oddMedia.toFixed(2), 'purple');
+  setVal('d-maior', fmt(maiorGanho), 'green');
+
+  // Config derived
+  updateConfigDerived();
+
+  // Alertas
+  const alertLoss = document.getElementById('alert-loss');
+  const alertWin = document.getElementById('alert-win');
+  alertLoss.classList.toggle('show', totalLucro <= stopLoss);
+  alertWin.classList.toggle('show', totalLucro >= stopWin && stopWin > 0);
+
+  // Por competição
+  const comps = ['NBA', 'Champions League', 'Libertadores', 'Sul-Americana', 'Brasileirão', 'Copa do Mundo'];
+  const compGrid = document.getElementById('comp-grid');
+  compGrid.innerHTML = comps.map(c => {
+    const cb = bets.filter(b => b.comp === c);
+    const cResolved = cb.filter(b => b.resultado !== 'Pendente');
+    const cGanhou = cb.filter(b => b.resultado === 'Ganhou');
+    const cLucro = cResolved.reduce((s, b) => s + b.lucroLiquido, 0);
+    const cInvest = cResolved.reduce((s, b) => s + b.entrada, 0);
+    const cAcerto = cResolved.length > 0 ? (cGanhou.length / cResolved.length) * 100 : 0;
+    const cRoi = cInvest > 0 ? (cLucro / cInvest) * 100 : 0;
+    const lClass = cLucro >= 0 ? 'green' : 'red';
+    return `<div class="comp-card">
+      <h3>${c}</h3>
+      <div class="comp-row"><span>Apostas</span><strong>${cb.length}</strong></div>
+      <div class="comp-row"><span>Acerto</span><strong class="${cAcerto >= 55 ? 'green' : cAcerto >= 45 ? 'yellow' : cAcerto > 0 ? 'red' : ''}">${cAcerto.toFixed(1)}%</strong></div>
+      <div class="comp-row"><span>Lucro</span><strong class="${lClass}">${fmt(cLucro)}</strong></div>
+      <div class="comp-row"><span>ROI</span><strong class="${lClass}">${cRoi >= 0 ? '+' : ''}${cRoi.toFixed(1)}%</strong></div>
+    </div>`;
+  }).join('');
+}
+
+function updateConfigDerived() {
+  const b = config.bancaInicial;
+  document.getElementById('cfg-sl').textContent = `-${fmt(b * 0.1)}`;
+  document.getElementById('cfg-sw').textContent = `+${fmt(b * 0.1)}`;
+  document.getElementById('cfg-ep').textContent = fmt(b * 0.02);
+}
+
+// ---- UTILS ----
+function fmt(v) {
+  return (parseFloat(v) || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+function fmtPct(v) {
+  return `${(parseFloat(v) || 0).toFixed(2)}%`;
+}
+function fmtDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function today() {
+  return new Date().toISOString().slice(0, 10);
+}
+function setVal(id, text, cls) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = text;
+  if (cls) el.className = cls + ' value';
+  else if (el.className.includes('value')) el.className = 'value';
+}
+
+// ---- TABS ----
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ---- INIT ----
+loadData();
+document.getElementById('f-data').value = today();
+updateConfigDerived();
+renderTable();
+updateDashboard();
+</script>
+</body>
+</html>
