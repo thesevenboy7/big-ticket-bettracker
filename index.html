@@ -141,6 +141,60 @@
   .table-controls input, .table-controls select { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 13px; }
   .table-controls input { flex: 1; min-width: 200px; }
   .table-controls input:focus, .table-controls select:focus { outline: none; border-color: var(--accent); }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    header { padding: 12px 16px; }
+    .header-logo { width: 38px; height: 38px; }
+    header h1 { font-size: 17px; }
+    .header-sub { display: none; }
+    .header-banca strong { font-size: 15px; }
+
+    nav { padding: 0; }
+    nav button { flex: 1; padding: 12px 8px; font-size: 13px; text-align: center; }
+
+    main { padding: 14px; }
+
+    .hero { min-height: 120px; border-radius: 8px; }
+    .hero-content { padding: 16px; }
+    .hero-content h2 { font-size: 20px; }
+
+    .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .kpi-card { padding: 12px; }
+    .kpi-card .value { font-size: 17px; }
+
+    .section { padding: 14px; border-radius: 8px; }
+
+    .comp-grid { grid-template-columns: 1fr; }
+
+    .form-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .form-field.wide { grid-column: span 2; }
+    .form-field input, .form-field select, .form-field textarea { padding: 10px 12px; font-size: 16px; /* evita zoom no iOS */ }
+
+    .form-calc { gap: 12px; font-size: 12px; }
+
+    .btn { width: 100%; padding: 12px; font-size: 15px; }
+    .btn-sm { width: auto; padding: 6px 12px; font-size: 12px; }
+
+    .table-controls { gap: 8px; }
+    .table-controls input { min-width: 0; }
+    .table-controls select { width: 100%; }
+
+    /* Tabela vira cards no mobile */
+    table thead { display: none; }
+    table, tbody, tr, td { display: block; width: 100%; }
+    tr { background: var(--bg3); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; padding: 12px; }
+    td { padding: 4px 0; border: none; white-space: normal; display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
+    td::before { content: attr(data-label); color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: .4px; flex-shrink: 0; margin-right: 8px; }
+    td:last-child { margin-top: 8px; justify-content: flex-end; gap: 8px; }
+    td:last-child::before { display: none; }
+
+    .config-grid { grid-template-columns: 1fr; }
+
+    .modal { width: 96%; padding: 16px; border-radius: 8px; }
+    .modal .form-grid { grid-template-columns: 1fr; }
+    .modal .form-field.wide { grid-column: span 1; }
+  }
 </style>
 </head>
 <body>
@@ -580,18 +634,18 @@ function renderTable() {
     const lucroClass = b.lucroLiquido > 0 ? 'green' : b.lucroLiquido < 0 ? 'red' : '';
     const badge = b.resultado === 'Ganhou' ? 'badge-ganhou' : b.resultado === 'Perdeu' ? 'badge-perdeu' : 'badge-pendente';
     return `<tr>
-      <td style="color:var(--text2)">${bets.length - bets.indexOf(b)}</td>
-      <td>${fmtDate(b.data)}</td>
-      <td>${b.comp}</td>
-      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis" title="${esc(b.jogo)}">${esc(b.jogo)}</td>
-      <td>${fmt(b.entrada)}</td>
-      <td>${parseFloat(b.odd).toFixed(2)}</td>
-      <td>${fmt(b.retornoBruto)}</td>
-      <td class="${lucroClass}">${fmt(b.lucroLiquido)}</td>
-      <td class="${lucroClass}">${fmtPct(b.pctBanca)}</td>
-      <td><span class="badge ${badge}">${b.resultado}</span></td>
-      <td style="color:var(--text2)">${esc(b.casa)}</td>
-      <td style="display:flex;gap:6px;">
+      <td data-label="#">${bets.length - bets.indexOf(b)}</td>
+      <td data-label="Data">${fmtDate(b.data)}</td>
+      <td data-label="Comp.">${b.comp}</td>
+      <td data-label="Jogo" style="max-width:220px;overflow:hidden;text-overflow:ellipsis" title="${esc(b.jogo)}">${esc(b.jogo)}</td>
+      <td data-label="Entrada">${fmt(b.entrada)}</td>
+      <td data-label="Odd">${parseFloat(b.odd).toFixed(2)}</td>
+      <td data-label="Retorno">${fmt(b.retornoBruto)}</td>
+      <td data-label="Lucro" class="${lucroClass}">${fmt(b.lucroLiquido)}</td>
+      <td data-label="% Banca" class="${lucroClass}">${fmtPct(b.pctBanca)}</td>
+      <td data-label="Resultado"><span class="badge ${badge}">${b.resultado}</span></td>
+      <td data-label="Casa">${esc(b.casa)}</td>
+      <td>
         <button class="btn btn-edit btn-sm" onclick="openEdit(${b.id})">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="deleteBet(${b.id})">✕</button>
       </td>
